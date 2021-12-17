@@ -20,10 +20,10 @@
 using namespace std;
 // using namespace __gnu_pbds;
  
-const int N = 5e2+7;
+const int N = 3e5+7;
 const int M = 600;
 const int MOD = 998244353;
-const int K = 1e3+7;
+const int K = 1e5+7;
  
 template<class T> bool umin(T& a, T b) { if(a > b){ a = b; return 1; } return 0;}
 template<class T> bool umax(T& a, T b) { if(a < b){ a = b;return 1;}return 0;}
@@ -33,31 +33,50 @@ template<class T> bool umod(T& a) { while(a < 0) a += MOD; a %= MOD; return 1;}
 //	freopen("file.in" , "r" , stdin);
 //	freopen("file.out" , "w" , stdout);
 
-int n;
-char s[N];
-int dp[N][N];
-
-int rec(int l, int r){
-	//~ printf("enter l:%d, r:%d\n", l, r);
-	if(l > r)	return 0;
-	if(l == r) return 1;
-	int &ret = dp[l][r];
-	if(~ret) return ret;
-	ret = rec(l+1, r) + 1;
-	
-	for(int i=l+1; i<=r; i++)
-		if(s[i] == s[l])
-			umin(ret, rec(l+1, i-1) + rec(i, r));
-	
-	return ret;
-}
+int n, a[N], b[N], vis[N], track[N], lim;
 
 int main(){
-	scanf("%d", &n);
-	scanf("%s", s);
-	
-	memset(dp, -1, sizeof dp);
-	printf("%d\n", rec(0, n-1));
-	
+    scanf("%d", &n);
+    for(int i=1; i<=n; i++)
+        scanf("%d", &a[i]);
+    for(int i=1; i<=n; i++)
+        scanf("%d", &b[i]), b[i] = i+b[i];
+    
+    queue<int> Q;
+    vis[n] = lim = n+1;
+    Q.push(n);
+    
+    while(!Q.empty()){
+        int tr = Q.front();
+        Q.pop();
+        //~ printf("tr:%d\n", tr);
+        if(tr == 0) break;
+        
+        for(int i=tr-a[tr]; i<min(lim, tr); i++){
+            if(!vis[b[i]]){
+                vis[b[i]] = tr, track[b[i]] = i;
+                Q.push(b[i]);
+            }
+        }
+        
+        lim = min(lim, tr-a[tr]);
+    }
+    
+    if(!vis[0])
+        puts("-1");
+    else{
+        vector<int> v;
+        int cur = 0;
+        while(cur <= n){
+            v.pb(track[cur]);
+            cur = vis[cur];
+        }
+        
+        printf("%d\n", sz(v)-1);
+        for(int i=sz(v)-2; i>=0; i--)
+            printf("%d ", v[i]);
+        puts("");
+    }
+    
 	return 0;
 }

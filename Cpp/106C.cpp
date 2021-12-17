@@ -20,10 +20,10 @@
 using namespace std;
 // using namespace __gnu_pbds;
  
-const int N = 5e2+7;
+const int N = 1e3+2;
 const int M = 600;
 const int MOD = 998244353;
-const int K = 1e3+7;
+const int K = 1e3+2;
  
 template<class T> bool umin(T& a, T b) { if(a > b){ a = b; return 1; } return 0;}
 template<class T> bool umax(T& a, T b) { if(a < b){ a = b;return 1;}return 0;}
@@ -33,31 +33,31 @@ template<class T> bool umod(T& a) { while(a < 0) a += MOD; a %= MOD; return 1;}
 //	freopen("file.in" , "r" , stdin);
 //	freopen("file.out" , "w" , stdout);
 
-int n;
-char s[N];
-int dp[N][N];
-
-int rec(int l, int r){
-	//~ printf("enter l:%d, r:%d\n", l, r);
-	if(l > r)	return 0;
-	if(l == r) return 1;
-	int &ret = dp[l][r];
-	if(~ret) return ret;
-	ret = rec(l+1, r) + 1;
-	
-	for(int i=l+1; i<=r; i++)
-		if(s[i] == s[l])
-			umin(ret, rec(l+1, i-1) + rec(i, r));
-	
-	return ret;
-}
+int n, m, c0, d0;
+int a[N], b[N], c[N], d[N];
+int dp[N];
 
 int main(){
-	scanf("%d", &n);
-	scanf("%s", s);
-	
-	memset(dp, -1, sizeof dp);
-	printf("%d\n", rec(0, n-1));
-	
+  scanf("%d%d%d%d", &n, &m, &c0, &d0);
+  for(int i=1; i<=m; i++)
+    scanf("%d%d%d%d", &a[i], &b[i], &c[i], &d[i]);
+  
+  memset(dp, -1, sizeof(dp));
+  dp[0] = 0;
+  for(int i=1; i<=m; i++){
+    for(int j=n; j>=0; j--)
+      if(~dp[j]){
+        for(int k=0; k*b[i] <= a[i]; k++)
+          if(j+(k*c[i]) <= n)
+            dp[j+(k*c[i])] = max(dp[j+(k*c[i])], dp[j] + d[i]*k);
+      }
+  }
+  
+  int ans = 0;
+  for(int i=0; i<=n; i++)
+    if(~dp[i])
+      ans = max(ans, dp[i] + (n-i)/c0 * d0);
+  printf("%d\n", ans);
+  
 	return 0;
 }

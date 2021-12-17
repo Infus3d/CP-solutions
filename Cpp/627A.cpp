@@ -20,10 +20,10 @@
 using namespace std;
 // using namespace __gnu_pbds;
  
-const int N = 5e2+7;
+const int N = 1e5+2;
 const int M = 600;
 const int MOD = 998244353;
-const int K = 1e3+7;
+const int K = 1e3+2;
  
 template<class T> bool umin(T& a, T b) { if(a > b){ a = b; return 1; } return 0;}
 template<class T> bool umax(T& a, T b) { if(a < b){ a = b;return 1;}return 0;}
@@ -33,31 +33,32 @@ template<class T> bool umod(T& a) { while(a < 0) a += MOD; a %= MOD; return 1;}
 //	freopen("file.in" , "r" , stdin);
 //	freopen("file.out" , "w" , stdout);
 
-int n;
-char s[N];
-int dp[N][N];
-
-int rec(int l, int r){
-	//~ printf("enter l:%d, r:%d\n", l, r);
-	if(l > r)	return 0;
-	if(l == r) return 1;
-	int &ret = dp[l][r];
-	if(~ret) return ret;
-	ret = rec(l+1, r) + 1;
-	
-	for(int i=l+1; i<=r; i++)
-		if(s[i] == s[l])
-			umin(ret, rec(l+1, i-1) + rec(i, r));
-	
-	return ret;
-}
+int n, a, b;
+vector<int> one, two;
+int ans = MOD;
 
 int main(){
-	scanf("%d", &n);
-	scanf("%s", s);
-	
-	memset(dp, -1, sizeof dp);
-	printf("%d\n", rec(0, n-1));
-	
+    scanf("%d", &n);
+    for(int i=1; i<=n; i++){
+        scanf("%d%d", &a, &b);
+        if(a == 1) one.pb(b);
+        else two.pb(b);
+    }
+    sort(all(one)); sort(all(two));
+    
+    for(int i=0; i<=sz(one); i++){
+        for(int j=0; j<=sz(two); j++){
+            int hor = 0;
+            for(int v=0; v<i; v++)
+                hor += one[v];
+            for(int v=0; v<j; v++)
+                hor += two[v];
+            
+            if(hor <= 2*(sz(two)-j) + (sz(one)-i))
+                ans = min(ans, 2*(sz(two)-j) + (sz(one)-i));
+        }
+    }
+    printf("%d\n", ans);
+    
 	return 0;
 }

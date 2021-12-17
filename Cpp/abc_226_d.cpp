@@ -2,7 +2,7 @@
 // #include "ext/pb_ds/assoc_container.hpp"
  
 #define mp make_pair
-#define pb push_back
+#define pb emplace_back
 #define ppb pop_back
 #define db puts("*****")
 #define mid(x , y) ((x+y)>>1)
@@ -20,10 +20,10 @@
 using namespace std;
 // using namespace __gnu_pbds;
  
-const int N = 5e2+7;
+const int N = 5e1+7;
 const int M = 600;
 const int MOD = 998244353;
-const int K = 1e3+7;
+const int K = 1e4+7;
  
 template<class T> bool umin(T& a, T b) { if(a > b){ a = b; return 1; } return 0;}
 template<class T> bool umax(T& a, T b) { if(a < b){ a = b;return 1;}return 0;}
@@ -33,31 +33,27 @@ template<class T> bool umod(T& a) { while(a < 0) a += MOD; a %= MOD; return 1;}
 //	freopen("file.in" , "r" , stdin);
 //	freopen("file.out" , "w" , stdout);
 
-int n;
-char s[N];
-int dp[N][N];
+int n, k;
+int pw[N][K], fact[N];
 
-int rec(int l, int r){
-	//~ printf("enter l:%d, r:%d\n", l, r);
-	if(l > r)	return 0;
-	if(l == r) return 1;
-	int &ret = dp[l][r];
-	if(~ret) return ret;
-	ret = rec(l+1, r) + 1;
-	
-	for(int i=l+1; i<=r; i++)
-		if(s[i] == s[l])
-			umin(ret, rec(l+1, i-1) + rec(i, r));
-	
-	return ret;
+int get(int v){
+    return (1LL * pw[v][k] * fact[v]) % MOD;
 }
 
 int main(){
-	scanf("%d", &n);
-	scanf("%s", s);
-	
-	memset(dp, -1, sizeof dp);
-	printf("%d\n", rec(0, n-1));
-	
+    scanf("%d%d", &n, &k);
+    fact[0] = 1;
+    for(int i=1; i<=n; i++){
+        fact[i] = (1LL * fact[i-1] * i) % MOD;
+        pw[i][0] = 1;
+        for(int j=1; j<=k; j++)
+            pw[i][j] = (1LL * pw[i][j-1] * i) % MOD;
+    }
+    
+    int ans = 0;
+    for(int i=2; i<=n; i++)
+        ans = (ans + get(i)) % MOD;
+    printf("%d\n", ans+1);
+    
 	return 0;
 }

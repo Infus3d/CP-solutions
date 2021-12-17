@@ -20,7 +20,7 @@
 using namespace std;
 // using namespace __gnu_pbds;
  
-const int N = 5e2+7;
+const int N = 2e5+7;
 const int M = 600;
 const int MOD = 998244353;
 const int K = 1e3+7;
@@ -33,31 +33,24 @@ template<class T> bool umod(T& a) { while(a < 0) a += MOD; a %= MOD; return 1;}
 //	freopen("file.in" , "r" , stdin);
 //	freopen("file.out" , "w" , stdout);
 
-int n;
-char s[N];
-int dp[N][N];
-
-int rec(int l, int r){
-	//~ printf("enter l:%d, r:%d\n", l, r);
-	if(l > r)	return 0;
-	if(l == r) return 1;
-	int &ret = dp[l][r];
-	if(~ret) return ret;
-	ret = rec(l+1, r) + 1;
-	
-	for(int i=l+1; i<=r; i++)
-		if(s[i] == s[l])
-			umin(ret, rec(l+1, i-1) + rec(i, r));
-	
-	return ret;
-}
+int n, d[N];
+map<int, int> mk;
+int k, mx;
 
 int main(){
-	scanf("%d", &n);
-	scanf("%s", s);
-	
-	memset(dp, -1, sizeof dp);
-	printf("%d\n", rec(0, n-1));
-	
+    scanf("%d", &n);
+    for(int i=1; i<=n; i++){
+        scanf("%d", &d[i]);
+        mk[d[i]] = max(mk[d[i]], mk[d[i]-1]+1);
+        if(k < mk[d[i]])
+            k = mk[d[i]], mx = d[i];
+    }
+    
+    printf("%d\n", k);
+    for(int i=1; i<=n; i++)
+        if(d[i] == mx-k+1 && k > 0)
+            printf("%d ", i), k--;
+    puts("");
+    
 	return 0;
 }

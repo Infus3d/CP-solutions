@@ -20,9 +20,9 @@
 using namespace std;
 // using namespace __gnu_pbds;
  
-const int N = 5e2+7;
+const int N = 1e5+7;
 const int M = 600;
-const int MOD = 998244353;
+const int MOD = 1e9+7;
 const int K = 1e3+7;
  
 template<class T> bool umin(T& a, T b) { if(a > b){ a = b; return 1; } return 0;}
@@ -33,31 +33,27 @@ template<class T> bool umod(T& a) { while(a < 0) a += MOD; a %= MOD; return 1;}
 //	freopen("file.in" , "r" , stdin);
 //	freopen("file.out" , "w" , stdout);
 
-int n;
-char s[N];
-int dp[N][N];
-
-int rec(int l, int r){
-	//~ printf("enter l:%d, r:%d\n", l, r);
-	if(l > r)	return 0;
-	if(l == r) return 1;
-	int &ret = dp[l][r];
-	if(~ret) return ret;
-	ret = rec(l+1, r) + 1;
-	
-	for(int i=l+1; i<=r; i++)
-		if(s[i] == s[l])
-			umin(ret, rec(l+1, i-1) + rec(i, r));
-	
-	return ret;
-}
+int testcase, k, a, b;
+int dp[N];
 
 int main(){
-	scanf("%d", &n);
-	scanf("%s", s);
-	
-	memset(dp, -1, sizeof dp);
-	printf("%d\n", rec(0, n-1));
-	
+    scanf("%d%d", &testcase, &k);
+    
+    dp[0] = 1;
+    for(int i=0; i<=1e5; i++){
+        dp[i+1] = (dp[i+1] + dp[i]) % MOD;
+        if(i+k <= 1e5)
+            dp[i+k] = (dp[i+k] + dp[i]) % MOD;
+    }
+    
+    dp[0] = 0;
+    for(int i=1; i<=1e5; i++)
+        dp[i] = (dp[i-1] + dp[i]) % MOD;
+    
+    while(testcase--){
+        scanf("%d%d", &a, &b);
+        printf("%d\n", (dp[b] - dp[a-1] + MOD) % MOD);
+    }
+    
 	return 0;
 }

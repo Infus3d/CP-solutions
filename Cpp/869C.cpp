@@ -15,39 +15,47 @@ using namespace std;
 
 const int N = 5e3+2;
 const int K = 1e3+2;
-const int MOD = 1e9+7;
+const int MOD = 998244353;
 
 template<class T> bool umin(T& a, T b) { if(a > b){ a = b; return 1; } return 0;}
 template<class T> bool umax(T& a, T b) { if(a < b){ a = b;return 1;}return 0;}
 
-int dp[N][N], n;
-char s[N];
+int a, b, c, ans, C[N][N];
+
+int mul(int x, int y){
+  return (1LL * x * y) % MOD;
+}
 
 int add(int x, int y){
-  return (x + y) % MOD;
+  return (0LL + x + y) % MOD;
+}
+
+int get(int x, int y){
+  if(x > y) 
+    swap(x, y);
+  
+  int ret = 0;
+  for(int r=0; r<=x; r++){
+    int f = 1;
+    for(int i=y-r+1; i<=y; i++)
+      f = mul(f, i);
+    ret = add(ret, mul(f, C[x][r]));
+  }
+  
+  return ret;
 }
 
 void solve(){
-  scanf("%d", &n);
-  for(int i=1; i<=n; i++)
-    scanf(" %c", &s[i]);
+  scanf("%d%d%d", &a, &b, &c);
   
-  dp[1][0] = 1;
-  for(int i=2; i<=n; i++){
-    int cur = 0;
-    for(int j=n; j>=0; j--){
-      cur = add(cur, dp[i-1][j]);
-      if(s[i-1] == 'f')
-        dp[i][j+1] = dp[i-1][j];
-      else
-        dp[i][j] = cur;
-    }
+  C[0][0] = 1;
+  for (int i = 1; i <= 5000; i++) {
+    C[i][0] = C[i][i] = 1;
+    for (int j = 1; j < i; j++)
+      C[i][j] = add(C[i-1][j-1], C[i-1][j]);
   }
-
-  int ans = 0;
-  for(int i=0; i<=n; i++)
-    ans = add(ans, dp[n][i]);
-  printf("%d\n", ans);
+  
+  printf("%d\n", mul(get(a, b), mul(get(a, c), get(b, c))));
 }
 
 int main(){

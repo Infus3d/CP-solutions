@@ -20,7 +20,7 @@
 using namespace std;
 // using namespace __gnu_pbds;
  
-const int N = 5e2+7;
+const int N = 1e5+7;
 const int M = 600;
 const int MOD = 998244353;
 const int K = 1e3+7;
@@ -33,31 +33,52 @@ template<class T> bool umod(T& a) { while(a < 0) a += MOD; a %= MOD; return 1;}
 //	freopen("file.in" , "r" , stdin);
 //	freopen("file.out" , "w" , stdout);
 
-int n;
-char s[N];
-int dp[N][N];
+int testcase, d[N], a, b, n, q;
 
-int rec(int l, int r){
-	//~ printf("enter l:%d, r:%d\n", l, r);
-	if(l > r)	return 0;
-	if(l == r) return 1;
-	int &ret = dp[l][r];
-	if(~ret) return ret;
-	ret = rec(l+1, r) + 1;
+struct segTree{
+	int T[N<<2], n;
 	
-	for(int i=l+1; i<=r; i++)
-		if(s[i] == s[l])
-			umin(ret, rec(l+1, i-1) + rec(i, r));
+	segTree(const int arr[], int _n){
+		n = _n;
+		build_tree(arr, 1, n, 1);
+	}
 	
-	return ret;
-}
+	void build_tree(const int* arr, int l, int r, int v){
+		if(l == r){
+			T[v] = arr[l];
+			return;
+		}
+		
+		build_tree(arr, l, mid(l, r), v<<1);
+		build_tree(arr, mid(l, r)+1, r, v<<1|1);
+		
+		T[v] = min(T[v<<1], T[v<<1|1]);
+	}
+	
+	int getMin(int x, int y, int l, int r, int v){
+		if(x > r || y < l)
+			return MOD;
+		
+		if(x <= l && r <= y)
+			return T[v];
+		
+		return min(getMin(x, y, l, mid(l, r), v<<1), getMin(x, y, mid(l, r)+1, r, v<<1|1));
+	}
+};
 
 int main(){
-	scanf("%d", &n);
-	scanf("%s", s);
-	
-	memset(dp, -1, sizeof dp);
-	printf("%d\n", rec(0, n-1));
+	scanf("%d", &testcase);
+	for(int t=1; t<=testcase; t++){
+		scanf("%d%d", &n, &q);
+		for(int i=1; i<=n; i++) scanf("%d", d+i);
+		segTree T(d, n);
+		
+		printf("Case %d:\n", t);
+		while(q--){
+			scanf("%d%d", &a, &b);
+			printf("%d\n", T.getMin(a, b, 1, n, 1));
+		}
+	}
 	
 	return 0;
 }

@@ -20,11 +20,12 @@
 using namespace std;
 // using namespace __gnu_pbds;
  
-const int N = 5e2+7;
+const int N = 18;
 const int M = 600;
 const int MOD = 998244353;
-const int K = 1e3+7;
- 
+const int K = 1e3+2;
+const ll INF = 1e18+7;
+
 template<class T> bool umin(T& a, T b) { if(a > b){ a = b; return 1; } return 0;}
 template<class T> bool umax(T& a, T b) { if(a < b){ a = b;return 1;}return 0;}
 template<class T> bool umod(T& a) { while(a < 0) a += MOD; a %= MOD; return 1;}
@@ -33,31 +34,43 @@ template<class T> bool umod(T& a) { while(a < 0) a += MOD; a %= MOD; return 1;}
 //	freopen("file.in" , "r" , stdin);
 //	freopen("file.out" , "w" , stdout);
 
-int n;
-char s[N];
-int dp[N][N];
-
-int rec(int l, int r){
-	//~ printf("enter l:%d, r:%d\n", l, r);
-	if(l > r)	return 0;
-	if(l == r) return 1;
-	int &ret = dp[l][r];
-	if(~ret) return ret;
-	ret = rec(l+1, r) + 1;
-	
-	for(int i=l+1; i<=r; i++)
-		if(s[i] == s[l])
-			umin(ret, rec(l+1, i-1) + rec(i, r));
-	
-	return ret;
-}
+int n, m, k, a, b, c;
+ll dp[(1<<N)+2][N+2];
+ll cost[N][N], d[N], ans;
 
 int main(){
-	scanf("%d", &n);
-	scanf("%s", s);
-	
-	memset(dp, -1, sizeof dp);
-	printf("%d\n", rec(0, n-1));
-	
-	return 0;
+  scanf("%d%d%d", &n, &m, &k);
+  for(int i=0; i<n; i++) scanf("%lld", &d[i]);
+  for(int i=1; i<=k; i++){
+    scanf("%d%d%d", &a, &b, &c);
+    a--, b--;
+    cost[a][b] = c;
+  }
+  
+  memset(dp, -1, sizeof(dp));
+  dp[0][0] = 0;
+  for(int mask=1; mask<(1<<n); mask++){
+    for(int i=0; i<n; i++){
+      if(!(mask&(1<<i))) continue;
+      int newMask = mask^(1<<i);
+      for(int j=0; j<n; j++){
+        if(~dp[newMask][j]){
+          if(dp[mask][i] == -1)
+            dp[mask][i] = dp[newMask][j] + d[i] + (!newMask ? 0 : cost[j][i]);
+          else
+            umax(dp[mask][i], dp[newMask][j] + d[i] + (!newMask ? 0 : cost[j][i]));
+        }
+      }
+    }
+  }
+  
+  for(int mask=0; mask<(1<<n); mask++)
+    if(__builtin_popcount(mask) == m){
+      for(int i=0; i<n; i++)
+        if(~dp[mask][i])
+          ans = max(ans, dp[mask][i]);
+    }
+  
+  printf("%lld\n", ans);
+  return 0;
 }

@@ -20,10 +20,10 @@
 using namespace std;
 // using namespace __gnu_pbds;
  
-const int N = 5e2+7;
+const int N = 2e5+2;
 const int M = 600;
 const int MOD = 998244353;
-const int K = 1e3+7;
+const int K = 1e3+2;
  
 template<class T> bool umin(T& a, T b) { if(a > b){ a = b; return 1; } return 0;}
 template<class T> bool umax(T& a, T b) { if(a < b){ a = b;return 1;}return 0;}
@@ -34,30 +34,24 @@ template<class T> bool umod(T& a) { while(a < 0) a += MOD; a %= MOD; return 1;}
 //	freopen("file.out" , "w" , stdout);
 
 int n;
-char s[N];
-int dp[N][N];
+int f[N], d[N];
 
-int rec(int l, int r){
-	//~ printf("enter l:%d, r:%d\n", l, r);
-	if(l > r)	return 0;
-	if(l == r) return 1;
-	int &ret = dp[l][r];
-	if(~ret) return ret;
-	ret = rec(l+1, r) + 1;
-	
-	for(int i=l+1; i<=r; i++)
-		if(s[i] == s[l])
-			umin(ret, rec(l+1, i-1) + rec(i, r));
-	
-	return ret;
+int mul(int x, int y){
+  return (1LL * x * y) % MOD;
 }
 
 int main(){
-	scanf("%d", &n);
-	scanf("%s", s);
-	
-	memset(dp, -1, sizeof dp);
-	printf("%d\n", rec(0, n-1));
-	
-	return 0;
+  f[0] = d[0] = 10;
+  for(int i=1; i<=2e5; i++){
+    d[i] = mul(d[i-1], (i < 2) ? 9 : 10);
+    f[i] = mul(f[i-1], (i < 3) ? 9 : 10);
+  }
+  
+  scanf("%d", &n);
+  for(int i=1; i<=n; i++){
+    printf("%d ", (mul(f[n-i], max(0, n-i-1)) + mul(d[n-i], min(2, n-i+1))) % MOD);
+  }
+  puts("");
+  
+  return 0;
 }

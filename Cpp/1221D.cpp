@@ -20,11 +20,12 @@
 using namespace std;
 // using namespace __gnu_pbds;
  
-const int N = 5e2+7;
+const int N = 3e5+2;
 const int M = 600;
 const int MOD = 998244353;
-const int K = 1e3+7;
- 
+const int K = 1e3+2;
+const ll INF = 1e18+7; 
+
 template<class T> bool umin(T& a, T b) { if(a > b){ a = b; return 1; } return 0;}
 template<class T> bool umax(T& a, T b) { if(a < b){ a = b;return 1;}return 0;}
 template<class T> bool umod(T& a) { while(a < 0) a += MOD; a %= MOD; return 1;}
@@ -33,31 +34,37 @@ template<class T> bool umod(T& a) { while(a < 0) a += MOD; a %= MOD; return 1;}
 //	freopen("file.in" , "r" , stdin);
 //	freopen("file.out" , "w" , stdout);
 
-int n;
-char s[N];
-int dp[N][N];
+int testcase;
+ll n, dp[N][3], a[N], b[N];
 
-int rec(int l, int r){
-	//~ printf("enter l:%d, r:%d\n", l, r);
-	if(l > r)	return 0;
-	if(l == r) return 1;
-	int &ret = dp[l][r];
-	if(~ret) return ret;
-	ret = rec(l+1, r) + 1;
-	
-	for(int i=l+1; i<=r; i++)
-		if(s[i] == s[l])
-			umin(ret, rec(l+1, i-1) + rec(i, r));
-	
-	return ret;
+void solve(){
+  scanf("%lld", &n);
+  for(int i=1; i<=n; i++)
+    scanf("%lld%lld", a+i, b+i);
+  for(int i=0; i<=n; i++)
+    for(int j=0; j<3; j++)
+      dp[i][j] = INF;
+  
+  dp[0][0] = 0LL;
+  for(int i=1; i<=n; i++)
+    for(int j=0; j<3; j++){
+      for(int v=0; v<3; v++){
+        if(i == 1 || a[i-1]+v != a[i]+j)
+          dp[i][j] = min(dp[i][j], dp[i-1][v] + b[i]*j);
+      }
+    }
+  
+  ll ans = INF;
+  for(int i=0; i<3; i++)
+    ans = min(ans, dp[n][i]);
+  printf("%lld\n", ans);
 }
 
 int main(){
-	scanf("%d", &n);
-	scanf("%s", s);
-	
-	memset(dp, -1, sizeof dp);
-	printf("%d\n", rec(0, n-1));
-	
-	return 0;
+  scanf("%d", &testcase);
+  while(testcase--){
+    solve();
+  }
+  
+  return 0;
 }

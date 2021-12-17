@@ -13,41 +13,31 @@
 
 using namespace std;
 
-const int N = 5e3+2;
+const int N = 2e5+2;
 const int K = 1e3+2;
-const int MOD = 1e9+7;
+const int MOD = 998244353;
 
 template<class T> bool umin(T& a, T b) { if(a > b){ a = b; return 1; } return 0;}
 template<class T> bool umax(T& a, T b) { if(a < b){ a = b;return 1;}return 0;}
 
-int dp[N][N], n;
-char s[N];
-
-int add(int x, int y){
-  return (x + y) % MOD;
-}
+int a, mx;
+vector<int> v;
 
 void solve(){
-  scanf("%d", &n);
-  for(int i=1; i<=n; i++)
-    scanf(" %c", &s[i]);
+  freopen("input.txt", "r", stdin);
+  while(!feof(stdin) && scanf("%d,", &a)) v.pb(a), umax(mx, a);
+  v.pop_back();
   
-  dp[1][0] = 1;
-  for(int i=2; i<=n; i++){
-    int cur = 0;
-    for(int j=n; j>=0; j--){
-      cur = add(cur, dp[i-1][j]);
-      if(s[i-1] == 'f')
-        dp[i][j+1] = dp[i-1][j];
-      else
-        dp[i][j] = cur;
+  ll ans = 1e18;
+  for(int i=0; i<=mx; i++){
+    ll cur = 0LL;
+    for(int j : v){
+      int b = abs(j-i);
+      cur += 1LL*b*(b+1)/2;
     }
+    umin(ans, cur);
   }
-
-  int ans = 0;
-  for(int i=0; i<=n; i++)
-    ans = add(ans, dp[n][i]);
-  printf("%d\n", ans);
+  printf("%lld\n", ans);
 }
 
 int main(){

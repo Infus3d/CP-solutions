@@ -20,10 +20,10 @@
 using namespace std;
 // using namespace __gnu_pbds;
  
-const int N = 5e2+7;
+const int N = 2e5+2;
 const int M = 600;
 const int MOD = 998244353;
-const int K = 1e3+7;
+const int K = 1e3+2;
  
 template<class T> bool umin(T& a, T b) { if(a > b){ a = b; return 1; } return 0;}
 template<class T> bool umax(T& a, T b) { if(a < b){ a = b;return 1;}return 0;}
@@ -33,31 +33,51 @@ template<class T> bool umod(T& a) { while(a < 0) a += MOD; a %= MOD; return 1;}
 //	freopen("file.in" , "r" , stdin);
 //	freopen("file.out" , "w" , stdout);
 
-int n;
-char s[N];
-int dp[N][N];
+int n, a, b;
+int d[N], uke[N], seme[N];
+vector<int> E[N];
 
-int rec(int l, int r){
-	//~ printf("enter l:%d, r:%d\n", l, r);
-	if(l > r)	return 0;
-	if(l == r) return 1;
-	int &ret = dp[l][r];
-	if(~ret) return ret;
-	ret = rec(l+1, r) + 1;
-	
-	for(int i=l+1; i<=r; i++)
-		if(s[i] == s[l])
-			umin(ret, rec(l+1, i-1) + rec(i, r));
-	
-	return ret;
+void dfsichi(int x, int par){
+  uke[x] += d[x];
+  for(int i : E[x])
+    if(i ^ par){
+      dfsichi(i, x);
+      uke[x] += max(0, uke[i]);
+    }
+}
+
+void dfsni(int x, int par){
+  int tot = d[x];
+  for(int i : E[x])
+    if(i ^ par){
+      tot += max(0, uke[i]);
+    }
+  
+  for(int i : E[x])
+    if(i ^ par){
+      seme[i] = tot - max(0, uke[i]) + max(0, seme[x]);
+      dfsni(i, x);
+    }
 }
 
 int main(){
-	scanf("%d", &n);
-	scanf("%s", s);
-	
-	memset(dp, -1, sizeof dp);
-	printf("%d\n", rec(0, n-1));
-	
-	return 0;
+  scanf("%d", &n);
+  for(int i=1; i<=n; i++){
+    scanf("%d", &d[i]);
+    if(d[i] == 0) d[i] = -1;
+  }
+  for(int i=1; i<n; i++){
+    scanf("%d%d", &a, &b);
+    E[a].pb(b);
+    E[b].pb(a);
+  }
+  
+  dfsichi(1, 0);
+  dfsni(1, 0);
+  
+  for(int i=1; i<=n; i++)
+    printf("%d ", uke[i] + max(0, seme[i]));
+  puts("");
+  
+  return 0;
 }

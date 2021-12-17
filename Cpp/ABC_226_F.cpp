@@ -20,10 +20,10 @@
 using namespace std;
 // using namespace __gnu_pbds;
  
-const int N = 5e2+7;
+const int N = 5e1+2;
 const int M = 600;
 const int MOD = 998244353;
-const int K = 1e3+7;
+const int K = 1e3+2;
  
 template<class T> bool umin(T& a, T b) { if(a > b){ a = b; return 1; } return 0;}
 template<class T> bool umax(T& a, T b) { if(a < b){ a = b;return 1;}return 0;}
@@ -33,31 +33,44 @@ template<class T> bool umod(T& a) { while(a < 0) a += MOD; a %= MOD; return 1;}
 //	freopen("file.in" , "r" , stdin);
 //	freopen("file.out" , "w" , stdout);
 
-int n;
-char s[N];
-int dp[N][N];
+int n, k, C[N][N], f[N];
+map<ll, int> dp[N];
 
-int rec(int l, int r){
-	//~ printf("enter l:%d, r:%d\n", l, r);
-	if(l > r)	return 0;
-	if(l == r) return 1;
-	int &ret = dp[l][r];
-	if(~ret) return ret;
-	ret = rec(l+1, r) + 1;
-	
-	for(int i=l+1; i<=r; i++)
-		if(s[i] == s[l])
-			umin(ret, rec(l+1, i-1) + rec(i, r));
-	
-	return ret;
+int lcm(int x, int y){
+    return x / __gcd(x, y) * y;
+}
+
+int pw(int x, int y){
+    if(y == 0) return 1;
+    if(y == 1) return x;
+    int tr = pw(x, y/2);
+    tr = (1LL * tr * tr) % MOD;
+    if(y%2) tr = (1LL * tr * x) % MOD;
+    return tr;
 }
 
 int main(){
-	scanf("%d", &n);
-	scanf("%s", s);
-	
-	memset(dp, -1, sizeof dp);
-	printf("%d\n", rec(0, n-1));
-	
+    scanf("%d%d", &n, &k);
+    C[0][0] = 1;
+    for(int i=1; i<=n; i++){
+        C[i][0] = C[i][i] = 1;
+        for(int j=1; j<i; j++)
+            C[i][j] = (C[i-1][j-1] + C[i-1][j]) % MOD;
+    }
+    f[0] = 1;
+    for(int i=1; i<=n; i++)
+        f[i] = (1LL * f[i-1] * i) % MOD;
+    
+    dp[0][1] = 1;
+    for(int i=0; i<n; i++)
+        for(auto mk : dp[i])
+            for(int j=1; j+i<=n; j++)
+                dp[i+j][lcm(j, mk.ff)] = (dp[i+j][lcm(j, mk.ff)] + ((1LL * mk.ss * ( (1LL * f[j-1] * C[n-i-1][j-1]) % MOD)) % MOD)) % MOD;
+    
+    int ans = 0;
+    for(auto i : dp[n])
+        ans = (ans + (1LL * i.ss * pw(i.ff, k))%MOD) % MOD;
+    printf("%d\n", ans);
+    
 	return 0;
 }

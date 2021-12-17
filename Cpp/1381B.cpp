@@ -20,10 +20,10 @@
 using namespace std;
 // using namespace __gnu_pbds;
  
-const int N = 5e2+7;
+const int N = 2e3+2;
 const int M = 600;
 const int MOD = 998244353;
-const int K = 1e3+7;
+const int K = 1e3+2;
  
 template<class T> bool umin(T& a, T b) { if(a > b){ a = b; return 1; } return 0;}
 template<class T> bool umax(T& a, T b) { if(a < b){ a = b;return 1;}return 0;}
@@ -33,31 +33,49 @@ template<class T> bool umod(T& a) { while(a < 0) a += MOD; a %= MOD; return 1;}
 //	freopen("file.in" , "r" , stdin);
 //	freopen("file.out" , "w" , stdout);
 
-int n;
-char s[N];
-int dp[N][N];
+int dp[2*N][N][2], d[2*N], mx[2*N];
+int testcase, n;
 
-int rec(int l, int r){
-	//~ printf("enter l:%d, r:%d\n", l, r);
-	if(l > r)	return 0;
-	if(l == r) return 1;
-	int &ret = dp[l][r];
-	if(~ret) return ret;
-	ret = rec(l+1, r) + 1;
-	
-	for(int i=l+1; i<=r; i++)
-		if(s[i] == s[l])
-			umin(ret, rec(l+1, i-1) + rec(i, r));
-	
-	return ret;
+int rec(int ind, int x, int v){
+  if(x > n || ind-x-1 > n) return 0;
+  if(ind > 2*n){
+    if(x == n)  return 1;
+    else return 0;
+  }
+  
+  int &ret = dp[ind][x][v];
+  if(~ret) return ret;
+  
+  ret = 0;
+  if(d[ind] > mx[ind-1])
+    ret |= rec(ind+1, x+(!v), v^1);
+  ret |= rec(ind+1, x+v, v);
+  return ret;
+}
+
+void solve(){
+  scanf("%d", &n);
+  for(int i=1; i<=2*n; i++){
+    scanf("%d", &d[i]);
+    mx[i] = max(mx[i-1], d[i]);
+  }
+  
+  for(int i=0; i<=2*n+1; i++)
+    for(int j=0; j<=n+1; j++)
+      for(int v=0; v<2; v++)
+        dp[i][j][v] = -1;
+  
+  if(rec(2, 1, 1))
+    puts("YES");
+  else
+    puts("NO");
 }
 
 int main(){
-	scanf("%d", &n);
-	scanf("%s", s);
-	
-	memset(dp, -1, sizeof dp);
-	printf("%d\n", rec(0, n-1));
-	
-	return 0;
+  scanf("%d", &testcase);
+  while(testcase--){
+    solve();
+  }
+  
+  return 0;
 }

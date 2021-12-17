@@ -13,45 +13,35 @@
 
 using namespace std;
 
-const int N = 5e3+2;
+const int N = 2e5+2;
 const int K = 1e3+2;
-const int MOD = 1e9+7;
+const int MOD = 998244353;
 
 template<class T> bool umin(T& a, T b) { if(a > b){ a = b; return 1; } return 0;}
 template<class T> bool umax(T& a, T b) { if(a < b){ a = b;return 1;}return 0;}
 
-int dp[N][N], n;
-char s[N];
-
-int add(int x, int y){
-  return (x + y) % MOD;
-}
-
 void solve(){
-  scanf("%d", &n);
-  for(int i=1; i<=n; i++)
-    scanf(" %c", &s[i]);
+  int n;
+  vector<int> v;
+  while(!feof(stdin) && scanf("%d,", &n)) v.pb(n);
+  v.pop_back();
   
-  dp[1][0] = 1;
-  for(int i=2; i<=n; i++){
-    int cur = 0;
-    for(int j=n; j>=0; j--){
-      cur = add(cur, dp[i-1][j]);
-      if(s[i-1] == 'f')
-        dp[i][j+1] = dp[i-1][j];
-      else
-        dp[i][j] = cur;
-    }
+  ll a[300], ans = v.size();
+  memset(a, 0, sizeof(a));
+  for(int i : v)  a[i]++;
+  for(int i=0; i<256; i++){
+    ans += a[i];
+    a[i+9] += a[i];
+    a[i+7] += a[i];
   }
-
-  int ans = 0;
-  for(int i=0; i<=n; i++)
-    ans = add(ans, dp[n][i]);
-  printf("%d\n", ans);
+  printf("%lld\n", ans);
 }
 
 int main(){
+  ll tot = 0;
+  printf("%lld\n", tot);
   int testcase = 1;
+  freopen("input.txt", "r", stdin);
   //~ scanf("%d", &testcase);
   while(testcase--){
     solve();

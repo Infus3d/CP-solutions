@@ -20,10 +20,10 @@
 using namespace std;
 // using namespace __gnu_pbds;
  
-const int N = 5e2+7;
+const int N = 1e3+2;
 const int M = 600;
 const int MOD = 998244353;
-const int K = 1e3+7;
+const int K = 1e3+2;
  
 template<class T> bool umin(T& a, T b) { if(a > b){ a = b; return 1; } return 0;}
 template<class T> bool umax(T& a, T b) { if(a < b){ a = b;return 1;}return 0;}
@@ -33,31 +33,45 @@ template<class T> bool umod(T& a) { while(a < 0) a += MOD; a %= MOD; return 1;}
 //	freopen("file.in" , "r" , stdin);
 //	freopen("file.out" , "w" , stdout);
 
-int n;
-char s[N];
-int dp[N][N];
-
-int rec(int l, int r){
-	//~ printf("enter l:%d, r:%d\n", l, r);
-	if(l > r)	return 0;
-	if(l == r) return 1;
-	int &ret = dp[l][r];
-	if(~ret) return ret;
-	ret = rec(l+1, r) + 1;
-	
-	for(int i=l+1; i<=r; i++)
-		if(s[i] == s[l])
-			umin(ret, rec(l+1, i-1) + rec(i, r));
-	
-	return ret;
-}
+int n, k;
+int dp[2][N<<1][4];
+int c[4][4];
 
 int main(){
-	scanf("%d", &n);
-	scanf("%s", s);
-	
-	memset(dp, -1, sizeof dp);
-	printf("%d\n", rec(0, n-1));
-	
+    scanf("%d%d", &n, &k);
+    for(int i=0; i<4; i++)
+        for(int j=0; j<4; j++){
+            if((i&1) ^ (j&1))
+                c[i][j]++;
+            if((i&2) ^ (j&2))
+                c[i][j]++;
+            if(c[i][j] && !((j&1) ^ ((j>>1)&1)))
+                c[i][j]--;
+        }
+    
+    for(int u=0; u<4; u++)
+        dp[0][1+((u&1)^((u>>1)&1))][u] = 1; 
+    for(int i=2; i<=n; i++){
+        for(int j=1; j<=k; j++){
+            for(int u=0; u<4; u++){
+                for(int v=0; v<4; v++){
+                    if(j-c[v][u] >= 0)
+                        dp[1][j][u] = (dp[1][j][u] + dp[0][j-c[v][u]][v]) % MOD;
+                }
+            }
+        }
+        for(int j=0; j<=k; j++){
+            for(int u=0; u<4; u++){
+                dp[0][j][u] = dp[1][j][u];
+                dp[1][j][u] = 0;
+            }
+        }
+    }
+    
+    int ans = 0;
+    for(int u=0; u<4; u++)
+        ans = (ans + dp[0][k][u]) % MOD;
+    printf("%d\n", ans);
+    
 	return 0;
 }

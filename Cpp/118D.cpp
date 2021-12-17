@@ -20,9 +20,9 @@
 using namespace std;
 // using namespace __gnu_pbds;
  
-const int N = 5e2+7;
+const int N = 1e2+7;
 const int M = 600;
-const int MOD = 998244353;
+const int MOD = 1e8;
 const int K = 1e3+7;
  
 template<class T> bool umin(T& a, T b) { if(a > b){ a = b; return 1; } return 0;}
@@ -33,31 +33,25 @@ template<class T> bool umod(T& a) { while(a < 0) a += MOD; a %= MOD; return 1;}
 //	freopen("file.in" , "r" , stdin);
 //	freopen("file.out" , "w" , stdout);
 
-int n;
-char s[N];
-int dp[N][N];
-
-int rec(int l, int r){
-	//~ printf("enter l:%d, r:%d\n", l, r);
-	if(l > r)	return 0;
-	if(l == r) return 1;
-	int &ret = dp[l][r];
-	if(~ret) return ret;
-	ret = rec(l+1, r) + 1;
-	
-	for(int i=l+1; i<=r; i++)
-		if(s[i] == s[l])
-			umin(ret, rec(l+1, i-1) + rec(i, r));
-	
-	return ret;
-}
+int n[2], k[2];
+int dp[N*2][N][2];
 
 int main(){
-	scanf("%d", &n);
-	scanf("%s", s);
+    scanf("%d%d%d%d", &n[0], &n[1], &k[0], &k[1]);
+    dp[0][0][0] = dp[0][0][1] = 1;
+    for(int i=0; i<n[0]+n[1]; i++){
+        for(int n1=0; n1<=min(i, n[0]); n1++){
+            int n2 = i-n1;
+            for(int j=1; j<=min(k[0], n[0]-n1); j++)
+                if(i+j <= n[0]+n[1])
+                    dp[i+j][n1+j][0] = (dp[i+j][n1+j][0] + dp[i][n1][1]) % MOD;
+            
+            for(int j=1; j<=min(n[1]-n2, k[1]); j++)
+                if(i+j <= n[0]+n[1])
+                    dp[i+j][n1][1] = (dp[i+j][n1][1] + dp[i][n1][0]) % MOD;
+        }
+    }
+    printf("%d\n", (dp[n[0]+n[1]][n[0]][0] + dp[n[0]+n[1]][n[0]][1]) % MOD);
 	
-	memset(dp, -1, sizeof dp);
-	printf("%d\n", rec(0, n-1));
-	
-	return 0;
+    return 0;
 }

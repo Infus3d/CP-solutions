@@ -33,31 +33,41 @@ template<class T> bool umod(T& a) { while(a < 0) a += MOD; a %= MOD; return 1;}
 //	freopen("file.in" , "r" , stdin);
 //	freopen("file.out" , "w" , stdout);
 
-int n;
-char s[N];
-int dp[N][N];
+int n, x, c[N][N], dp[N][N];
 
-int rec(int l, int r){
-	//~ printf("enter l:%d, r:%d\n", l, r);
-	if(l > r)	return 0;
-	if(l == r) return 1;
-	int &ret = dp[l][r];
-	if(~ret) return ret;
-	ret = rec(l+1, r) + 1;
-	
-	for(int i=l+1; i<=r; i++)
-		if(s[i] == s[l])
-			umin(ret, rec(l+1, i-1) + rec(i, r));
-	
-	return ret;
+int add(int x, int y){
+    x += y;
+    if(x >= MOD) x -= MOD;
+    return x;
+}
+
+int mul(int x, int y){
+    return (1LL * x * y) % MOD;
 }
 
 int main(){
-	scanf("%d", &n);
-	scanf("%s", s);
+    scanf("%d%d", &n, &x);
+    for(int i=0; i<=n; i++){
+        c[i][0] = c[i][i] = 1;
+        for(int j=1; j<i; j++)
+            c[i][j] = add(c[i-1][j], c[i-1][j-1]);
+    }
+    
+    dp[n][0] = 1;
+    for(int i=n; i>1; i--){
+        for(int j=0; j<x; j++){
+            int nextJ = min(x, j+i-1), pawa = 1;
+            for(int k=i; k>=0; k--){
+                dp[k][nextJ] = add(dp[k][nextJ], mul(dp[i][j], mul(c[i][i-k], pawa)));
+                pawa = mul(pawa, (nextJ-j));
+            }
+        }
+    }
+    
+    int ans = 0;
+    for(int i=0; i<=x; i++)
+        ans = add(ans, dp[0][i]);
+    printf("%d\n", ans);
 	
-	memset(dp, -1, sizeof dp);
-	printf("%d\n", rec(0, n-1));
-	
-	return 0;
+    return 0;
 }

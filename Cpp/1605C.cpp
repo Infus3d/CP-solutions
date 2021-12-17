@@ -20,7 +20,7 @@
 using namespace std;
 // using namespace __gnu_pbds;
  
-const int N = 5e2+7;
+const int N = 1e6+7;
 const int M = 600;
 const int MOD = 998244353;
 const int K = 1e3+7;
@@ -33,31 +33,43 @@ template<class T> bool umod(T& a) { while(a < 0) a += MOD; a %= MOD; return 1;}
 //	freopen("file.in" , "r" , stdin);
 //	freopen("file.out" , "w" , stdout);
 
-int n;
+int testcase, n, d[N][3];
 char s[N];
-int dp[N][N];
 
-int rec(int l, int r){
-	//~ printf("enter l:%d, r:%d\n", l, r);
-	if(l > r)	return 0;
-	if(l == r) return 1;
-	int &ret = dp[l][r];
-	if(~ret) return ret;
-	ret = rec(l+1, r) + 1;
-	
-	for(int i=l+1; i<=r; i++)
-		if(s[i] == s[l])
-			umin(ret, rec(l+1, i-1) + rec(i, r));
-	
-	return ret;
+int solve(){
+    scanf("%d", &n);
+    scanf("%s", s);
+    
+    for(int i=0; i<n; i++){
+        d[i][0] = d[i][1] = d[i][2] = 0;
+        d[i][s[i]-'a']++;
+        if(i > 0)
+            for(int j=0; j<3; j++)
+                d[i][j] += d[i-1][j];
+    }
+        
+    for(int i=0; i<n-1; i++)
+        if(s[i] == 'a' && s[i+1] == 'a')
+            return 2;
+    for(int i=0; i<n-2; i++)
+        if(s[i] == 'a' && s[i+2] == 'a')
+            return 3;
+    for(int i=0; i<n-3; i++)
+        if(s[i] == 'a' && s[i+3] == 'a' && (d[i+2][1] - d[i][1] == d[i+2][2] - d[i][2]))
+            return 4;
+    
+    for(int i=0; i<n-6; i++)
+        if(s[i] == 'a' && s[i+3] == 'a' && s[i+6] == 'a' && (d[i+5][1] - d[i][1] == d[i+5][2] - d[i][2]))
+            return 7;
+    
+     return -1;
 }
 
 int main(){
-	scanf("%d", &n);
-	scanf("%s", s);
-	
-	memset(dp, -1, sizeof dp);
-	printf("%d\n", rec(0, n-1));
-	
+    scanf("%d", &testcase);
+    while(testcase--){
+        printf("%d\n", solve());
+    }
+    
 	return 0;
 }
