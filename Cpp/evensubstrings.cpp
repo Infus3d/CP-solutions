@@ -1,3 +1,14 @@
+// a xor a xor a xor a = 0
+// a xor a xor a = a
+// So, to determine if something appears even number of times,
+// the xor of the range must be equal to 0.
+// However, 1 xor 2 xor 3 = 0 is also true, so we need to make sure
+// that everything you xor is a power of 2. There are only 6 letters
+// possible in the string, so 2^6 = 64 combinations of xor values.
+// In a segment tree, store all 64 combinations in every node and count how many times
+// a particular bitmask is seen in the range [l, r]. Let that be cnt.
+// Answer to the query is then (cnt * (cnt-1)) / 2  (or cnt choose 2).
+// Handle the updates accordingly.
 #include "bits/stdc++.h"
 
 #define ff first
@@ -8,7 +19,7 @@
 #define sz(x) int(x.size())
 #define pii pair <int , int>
 #define mid(x , y) ((x+y)>>1)
-#define all(x)	x.begin(),x.end()
+#define all(x)  x.begin(),x.end()
 #define y1 your_name_engraved_herein
 
 using namespace std;

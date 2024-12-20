@@ -1,3 +1,16 @@
+/*
+Binary search on the radius and see if you can fit in the N number of cells in there.
+If you can, then decrease the radius. If you can't, then increase the radius. Notice that
+the radius of the cookie can be at most sqrt(N). To calculate the number of cells that fit
+into a radius, solve for only one quarter of the circle, and use pythagorean theorem on each
+possible column (here hypotenuse = radius).
+
+You need to output the radius with 10^{-6} accuracy. Which means that you just need to iterate
+your binary search for log(sqrt(N) * 10^6) times. Or just run binary search for 100 iterations
+to be completely sure like below.
+
+Runtime O(sqrt(n) * log(n))
+*/
 #include "bits/stdc++.h"
 
 #define ff first
@@ -8,7 +21,7 @@
 #define sz(x) int(x.size())
 #define pii pair <int , int>
 #define mid(x , y) ((x+y)>>1)
-#define all(x)	x.begin(),x.end()
+#define all(x)  x.begin(),x.end()
 #define y1 your_name_engraved_herein
 
 using namespace std;
